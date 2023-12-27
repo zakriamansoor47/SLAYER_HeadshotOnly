@@ -1,7 +1,7 @@
 # Donate: If you like my work, you can donate to me via [Steam Trade Offer](https://bit.ly/3qDpgPd)
 
 ## Description:
-This plugin enables Headshot Only to all players OR Enables Headshot Only on Players themselves by using Public Command **!hs**.
+This plugin enables Headshot Only to all players **OR** Enables Headshot Only on Players themselves by using Public Command **!hs**.
 
 ## Installation:
 **1.** Upload files to your server.
