@@ -30,7 +30,7 @@ css_headshot - For RCON (Console) to Enable/Disable Headshot Only to all Players
   "PluginEnabled": true,                            // Enable/Disable plugin. (false = Disabled, true = Enabled)
   "AlwaysEnableHsOnly": false,                      // Always Enable Headshot Only in the Server. (false = No, true = Yes)
   "PlayerCanUseHsCmd": true,                        // Players Can use Headshot Only Command (!hs) to Enable/Disable Headshot Only on themselves (false = No, true = Yes)
-  "HsOnlyWeapons": "",                              // Headshot Only Enable for Specific Weapons (Empty "" Means Headshot enable for all Weapons). Spirit Weapon names by ";" like this (weapon_deagle;weapon_glock)
+  "HsOnlyWeapons": "",                              // Headshot Only Enable for Specific Weapons (Empty "" Means Headshot enable for all Weapons). Seperate Weapon names by ";" like this (weapon_deagle;weapon_glock)
   "AdminFlagtoForceHsOnly": "@css/root",            // Admin flag Which can Enable/Disable Headshot Only to All Players by Command (!headshot)
   "ConfigVersion": 1
 }
