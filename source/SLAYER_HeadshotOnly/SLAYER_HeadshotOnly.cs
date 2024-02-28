@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Modules.Utils;
 using CounterStrikeSharp.API.Modules.Admin;
@@ -9,22 +9,21 @@ using System.Text.Json.Serialization;
 namespace SLAYER_HeadshotOnly;
 
 // Used these to remove compile warnings
-#pragma warning disable CS8600
-#pragma warning disable CS8602 
-#pragma warning disable CS8604
+#pragma warning disable CS8602
 
 public class ConfigSpecials : BasePluginConfig
 {
     [JsonPropertyName("PluginEnabled")] public bool PluginEnabled { get; set; } = true;
     [JsonPropertyName("AlwaysEnableHsOnly")] public bool AlwaysEnableHsOnly { get; set; } = false;
     [JsonPropertyName("PlayerCanUseHsCmd")] public bool PlayerCanUseHsCmd { get; set; } = true;
+    [JsonPropertyName("HsOnlyWeapons")] public string HsOnlyWeapons { get; set; } = "";
     [JsonPropertyName("AdminFlagtoForceHsOnly")] public string AdminFlagtoForceHsOnly { get; set; } = "@css/root";
 }
 
 public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<ConfigSpecials>
 {
     public override string ModuleName => "SLAYER_HeadshotOnly";
-    public override string ModuleVersion => "1.0";
+    public override string ModuleVersion => "1.1";
     public override string ModuleAuthor => "SLAYER";
     public override string ModuleDescription => "Enable/Disable Headshot Only. Allow players to Enable/Disable Headshot Only on themselves";
 
@@ -33,6 +32,7 @@ public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<ConfigSpecials>
 
     public bool[] g_Headshot= new bool[64];
     public bool adminHeadshotOnly = false;
+    public string[] HsWeapons = new string[50];
 
     public void OnConfigParsed(ConfigSpecials config)
     {
@@ -42,30 +42,35 @@ public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<ConfigSpecials>
     {
         AddCommand("css_hs", "Enabled/Disabled Scope", cmd_hs);
         AddCommand("css_headshot", "Enabled/Disabled Scope", cmd_AdminHsOnly);
+        HsWeapons = Config.HsOnlyWeapons.Split(";");
         RegisterEventHandler<EventPlayerHurt>((@event, info) => 
         {
-            if(Config.PluginEnabled) // if Plugin is Enabled
+            CCSPlayerController attacker = @event.Attacker;
+            if(Config.PluginEnabled && g_Headshot[attacker.Slot] || adminHeadshotOnly || Config.AlwaysEnableHsOnly) // if Plugin is Enabled
             {
-                if (!@event.Userid.IsValid || @event.Userid == null)
+                var player = @event.Userid;
+                if (!player.IsValid || player== null)
                     return HookResult.Continue;
 
-                CCSPlayerController attacker = @event.Attacker;
-
-                if (!attacker.IsValid || @event.Userid.TeamNum == attacker.TeamNum && !(@event.DmgHealth > 0 || @event.DmgArmor > 0))
+                if (!attacker.IsValid || player.TeamNum == attacker.TeamNum && !(@event.DmgHealth > 0 || @event.DmgArmor > 0))
                     return HookResult.Continue;
 
+                if(Config.HsOnlyWeapons != "" && HsWeapons != null && HsWeapons.Count() > 0 && attacker.PlayerPawn.Value.WeaponServices!.MyWeapons.Count != 0) // Check, Is Headshot Weapons String is Empty or Not and player have weapons or not
+                {
+                    var ActiveWeaponName = attacker?.PlayerPawn?.Value.WeaponServices?.ActiveWeapon?.Value.DesignerName; // Get Active Weapon Name
+                    if(ActiveWeaponName != null && ActiveWeaponName != "" && !HsWeapons.Contains(ActiveWeaponName)) // Check, Is Headshot Only is Active on Current Weapon or not
+                    {
+                        return HookResult.Continue;
+                    }    
+                }
                 if(@event.Hitgroup != 1) // if bullet not hitting on Head
                 {
-                    if(g_Headshot[attacker.Slot] || adminHeadshotOnly || Config.AlwaysEnableHsOnly) // Check Player is Headshot Only Enabled on Him or Not
-                    {
-                        if(@event.Userid.PlayerPawn.Value.Health < 1)@event.Userid.PlayerPawn.Value.Health = 100; // If somehow player health get low from 1 then set it to 100
-                        else @event.Userid.PlayerPawn.Value.Health = @event.DmgHealth; // Otherwise add the dmg health to Normal health
-                        @event.Userid.PlayerPawn.Value.ArmorValue += @event.DmgArmor; // Update the Armor as well
-                    }
+                    player.PlayerPawn.Value.Health += @event.DmgHealth; // add the dmg health to Normal health
+                    player.PlayerPawn.Value.ArmorValue += @event.DmgArmor; // Update the Armor as well
                 }
             }
             return HookResult.Continue;
-        });
+        }, HookMode.Pre);
     }
     
     private void cmd_hs(CCSPlayerController? player, CommandInfo commandInfo)
