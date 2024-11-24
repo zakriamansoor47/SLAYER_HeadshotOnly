@@ -21,7 +21,6 @@ This plugin enables Headshot Only to all players **OR** Enables Headshot Only on
 ```
 !hs - For Everyone to Enable/Disable Headshot Only on themselves (Headshot Only will always be enabled if "AlwaysEnableHsOnly" is true in the config file)
 !headshot - For Admin with Specific Flag to Enable/Disable Headshot Only to all Players (Headshot Only will always be enabled if "AlwaysEnableHsOnly" is true in the config file)
-css_headshot - For RCON (Console) to Enable/Disable Headshot Only to all Players (Headshot Only will always be enabled if "AlwaysEnableHsOnly" is true in the config file)
 ```
 
 ## Configuration:
