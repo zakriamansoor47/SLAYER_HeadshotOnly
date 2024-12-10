@@ -11,7 +11,7 @@ namespace SLAYER_HeadshotOnly;
 // Used these to remove compile warnings
 #pragma warning disable CS8602
 
-public class ConfigSpecials: BasePluginConfig
+public class SLAYER_HeadshotOnlyConfig: BasePluginConfig
 {
     [JsonPropertyName("PluginEnabled")] public bool PluginEnabled { get; set; } = true;
     [JsonPropertyName("AlwaysEnableHsOnly")] public bool AlwaysEnableHsOnly { get; set; } = false;
@@ -20,21 +20,21 @@ public class ConfigSpecials: BasePluginConfig
     [JsonPropertyName("AdminFlagtoForceHsOnly")] public string AdminFlagtoForceHsOnly { get; set; } = "@css/root";
 }
 
-public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<ConfigSpecials>
+public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<SLAYER_HeadshotOnlyConfig>
 {
     public override string ModuleName => "SLAYER_HeadshotOnly";
-    public override string ModuleVersion => "1.2";
+    public override string ModuleVersion => "1.2.1";
     public override string ModuleAuthor => "SLAYER";
     public override string ModuleDescription => "Enable/Disable Headshot Only. Allow players to Enable/Disable Headshot Only on themselves";
 
 
-    public required ConfigSpecials Config {get; set;}
+    public required SLAYER_HeadshotOnlyConfig Config {get; set;}
 
     public bool[] g_Headshot= new bool[64];
     public bool adminHeadshotOnly = false;
     public string[] HsWeapons = new string[50];
 
-    public void OnConfigParsed(ConfigSpecials config)
+    public void OnConfigParsed(SLAYER_HeadshotOnlyConfig config)
     {
         Config = config;
     }
@@ -47,9 +47,11 @@ public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<ConfigSpecials>
         {
             var player = @event.Userid;
             var attacker = @event.Attacker;
+            var DmgHealth = @event.DmgHealth;
+            var DmgArmor = @event.DmgArmor;
             if(!Config.PluginEnabled || player == null || attacker == null || !player.IsValid || !attacker.IsValid)return HookResult.Continue;
             // Some Checks to validate Attacker
-            if (player.TeamNum == attacker.TeamNum && !(@event.DmgHealth > 0 || @event.DmgArmor > 0))return HookResult.Continue;
+            if (player.TeamNum == attacker.TeamNum && !(DmgHealth > 0 || DmgArmor > 0))return HookResult.Continue;
 
             if(g_Headshot[attacker.Slot] || adminHeadshotOnly || Config.AlwaysEnableHsOnly)
             {
@@ -59,12 +61,12 @@ public class SLAYER_HeadshotOnly : BasePlugin, IPluginConfig<ConfigSpecials>
                 }
                 if(@event.Hitgroup != 1) // if headshot is enabled and bullet not hitting on Head
                 {
-                    player.PlayerPawn.Value.Health += @event.DmgHealth; // add the dmg health to Normal health
-                    player.PlayerPawn.Value.ArmorValue += @event.DmgArmor; // Update the Armor as well
+                    player.PlayerPawn.Value.Health += DmgHealth; // add the dmg health to Normal health
+                    player.PlayerPawn.Value.ArmorValue += DmgArmor; // Update the Armor as well
                 }
             }
             return HookResult.Continue;
-        }, HookMode.Pre);
+        });
     }
     
     private void cmd_hs(CCSPlayerController? player, CommandInfo commandInfo)

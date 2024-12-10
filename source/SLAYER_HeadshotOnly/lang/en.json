@@ -1,0 +1,10 @@
+{
+    "Chat.Prefix":                  "{Gold}[{DarkRed}★ {Green}Headshot Only {DarkRed}★{Gold}]",
+    "Chat.PlayerHS_On":             "{Purple}Now you can {DarkRed}kill {Purple}with {Lime}Headshot Only!",
+    "Chat.AllHS_On":                "{Green}{0} {Purple}now {DarkRed}can kill with {Lime}Headshot Only!",
+    "Chat.PlayerHS_Off":            "{Purple}Now you can {DarkRed}kill {Lime}Normally!",
+    "Chat.AllHS_Off":               "{Olive}{0} {Purple}now can {DarkRed}kill {Lime}Normally!",
+    "Chat.AdminHS_On":              "{Purple}Admin {DarkRed}Enabled {Lime}Headshot Only!",
+    "Chat.AdminHS_Off":             "{Purple}Admin {DarkRed}Disabled {Lime}Headshot Only!"
+
+}
